@@ -16,18 +16,30 @@ class AuthController {
           });
         }
 
-        const profile = verificationResponse?.payload;
+        const profile = verificationResponse.payload;
 
         let user = await User.findOne({ email: profile.email });
         if (!user) {
           user = new User({
-            email: profile?.email,
-            firstName: profile?.given_name,
-            lastName: profile?.family_name,
-            picture: profile?.picture,
+            email: profile.email,
+            firstName: profile.given_name,
+            lastName: profile.family_name,
+            picture: profile.picture,
           });
           await user.save();
         }
+        // const profile = verificationResponse?.payload;
+
+        // let user = await User.findOne({ email: profile.email });
+        // if (!user) {
+        //   user = new User({
+        //     email: profile?.email,
+        //     firstName: profile?.given_name,
+        //     lastName: profile?.family_name,
+        //     picture: profile?.picture,
+        //   });
+        //   await user.save();
+        // }
 
         res.status(201).json({
           message: "Login was successful",
