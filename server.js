@@ -11,13 +11,21 @@ const { getObjectKey } = require("./helpers/utils.helper");
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://teamconnect-frontend.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://teamconnect-frontend.vercel.app",
+      "http://teamconnect-frontend.vercel.app",
+    ],
     methods: ["GET", "POST"],
   },
 });
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://teamconnect-frontend.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://teamconnect-frontend.vercel.app",
+      "http://teamconnect-frontend.vercel.app",
+    ],
     methods: "GET,POST,PUT,DELETE,OPTIONS",
   })
 );
@@ -33,8 +41,9 @@ runCronJobs();
 
 let onlineUsers = {};
 
-io.on("connection", (socket) => {
+let onlineChannelUsers = {};
 
+io.on("connection", (socket) => {
   socket.on("addUser", (email) => {
     onlineUsers[socket.id] = email;
   });
@@ -51,42 +60,62 @@ io.on("connection", (socket) => {
       });
     });
   });
-  
+
   socket.on("sendComment", (members) => {
-    const emails = []
-    members.map(member => {emails.push(member.user.email) })
+    const emails = [];
+    members.map((member) => {
+      emails.push(member.user.email);
+    });
     emails.map((email) => {
-      console.log({email})
       const socketIds = getObjectKey(onlineUsers, email);
       io.to(socketIds).emit("getComment", {
         email,
       });
     });
-  })
+  });
+
+  socket.on("addUnreadMessage", (channelMembers) => {
+    const emails = [];
+    channelMembers.map((member) => {
+      emails.push(member.user.email);
+    });
+    emails.map((email) => {
+      const socketIds = getObjectKey(onlineUsers, email);
+      io.to(socketIds).emit("getUnreadMessage", {
+        email,
+      });
+    });
+  });
 
   socket.on("sendMessage", (channelMembers) => {
-    const emails = []
-    channelMembers.map(member => {emails.push(member.user.email) })
+    const emails = [];
+    channelMembers.map((member) => {
+      emails.push(member.user.email);
+    });
     emails.map((email) => {
-      console.log({email})
       const socketIds = getObjectKey(onlineUsers, email);
       io.to(socketIds).emit("getMessage", {
         email,
       });
+      io.to(socketIds).emit("getUnreadMessage", {
+        email,
+      });
     });
-  })
+  });
 
   socket.on("updateBoard", (members) => {
-    const emails = []
-    members.map(member => {emails.push(member.user.email) })
+    const emails = [];
+    members.map((member) => {
+      emails.push(member.user.email);
+    });
     emails.map((email) => {
-      console.log({email})
+      console.log({ email });
       const socketIds = getObjectKey(onlineUsers, email);
       io.to(socketIds).emit("getNewBoard", {
         email,
       });
     });
-  })
+  });
 
   socket.on("disconnect", () => {
     delete onlineUsers[socket.id];

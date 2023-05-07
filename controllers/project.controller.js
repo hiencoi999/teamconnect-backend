@@ -6,9 +6,12 @@ const {
   deleteProject,
   getProjectAndMembers,
   renameProject,
+  getDeletedProjectsByUserId,
+  restoreProject,
 } = require("../services/project.service");
 const {
   getProjectMemberByProjectId,
+  removeMember,
 } = require("../services/projectMember.service");
 
 class ProjectController {
@@ -27,7 +30,8 @@ class ProjectController {
       );
       res.status(200).json({
         message: "Created",
-        project, channel
+        project,
+        channel,
       });
     } catch (error) {
       console.log(error);
@@ -53,18 +57,11 @@ class ProjectController {
   static async getAllDeleted(req, res) {
     try {
       const isDeleted = true;
-      const projects = await getProjectsByUserId(req.decoded.userId, isDeleted);
+      const projects = await getDeletedProjectsByUserId(
+        req.decoded.userId,
+        isDeleted
+      );
       res.status(200).send({ data: projects });
-    } catch (error) {
-      console.log(error);
-      res.status(500).json({
-        message: error.message,
-      });
-    }
-  }
-
-  static async restoreDeletedProject(req, res) {
-    try {
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -75,8 +72,11 @@ class ProjectController {
 
   static async getOne(req, res) {
     try {
-      const result = await getProjectAndMembers(req.params.projectId);
-      if (!result) res.status(404).json({ message: "Not Found" });
+      const result = await getProjectAndMembers(
+        req.params.projectId,
+        req.decoded.userId
+      );
+      if (!result) res.status(400).json({ message: "bad request" });
       else
         res
           .status(200)
@@ -96,6 +96,28 @@ class ProjectController {
         req.params.projectId
       );
       if (deletedProject) {
+        res.status(200).json({
+          message: "Deleted",
+        });
+      } else
+        res.status(403).json({
+          message: "You do not have permission",
+        });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  }
+
+  static async restoreOneProject(req, res) {
+    try {
+      const success = await restoreProject(
+        req.decoded.userId,
+        req.params.projectId
+      );
+      if (success) {
         res.status(200).json({
           message: "Deleted",
         });
@@ -140,11 +162,27 @@ class ProjectController {
     }
   }
 
+  static async removeProjectMember(req, res) {
+    try {
+      const success = await removeMember(req.params.memberId);
+      if (!success) res.status(400).json({ message: "bad request" });
+      else res.status(200).json({ message: "deleted" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({
+        message: error.message,
+      });
+    }
+  }
+
   static async updateName(req, res) {
     try {
-      const project = await renameProject(req.params.projectId, req.body.newName) 
-      if(!project) res.status(400).json({message: 'bad request'})
-      res.status(200).json({message: 'updated'})
+      const project = await renameProject(
+        req.params.projectId,
+        req.body.newName
+      );
+      if (!project) res.status(400).json({ message: "bad request" });
+      else res.status(200).json({ message: "updated" });
     } catch (error) {
       console.log(error);
       res.status(500).json({

@@ -151,27 +151,7 @@ async function updateTask(projectId, taskId, task) {
     oldTaskGroup.tasks.splice(index, 1);
     newTaskGroup.tasks.push(taskId);
     await Promise.all([oldTaskGroup.save(), newTaskGroup.save()]);
-  }
-
-  if (!updatedTask.assignee?.equals(task.assignee?._id)) {
-    const oldTaskGroup = await TaskGroup.findOne({
-      project: projectId,
-      assignee: updatedTask.assignee,
-      groupBy: "ASSIGNEE",
-    });
-    const newTaskGroup = await TaskGroup.findOne({
-      project: projectId,
-      assignee: task.assignee,
-      groupBy: "ASSIGNEE",
-    });
-    const index = oldTaskGroup.tasks.indexOf(taskId);
-    console.log({ index });
-    oldTaskGroup.tasks.splice(index, 1);
-    newTaskGroup.tasks.push(taskId);
-    await Promise.all([oldTaskGroup.save(), newTaskGroup.save()]);
-  }
-
-  if (updatedTask.priority !== task.priority) {
+  } else if (updatedTask.priority !== task.priority) {
     const oldTaskGroup = await TaskGroup.findOne({
       project: projectId,
       name: updatedTask.priority,
@@ -188,7 +168,23 @@ async function updateTask(projectId, taskId, task) {
     oldTaskGroup.tasks.splice(index, 1);
     newTaskGroup.tasks.push(taskId);
     await Promise.all([oldTaskGroup.save(), newTaskGroup.save()]);
+  } else if (!updatedTask.assignee?.equals(task.assignee?._id)) {
+    const oldTaskGroup = await TaskGroup.findOne({
+      project: projectId,
+      assignee: updatedTask.assignee,
+      groupBy: "ASSIGNEE",
+    });
+    const newTaskGroup = await TaskGroup.findOne({
+      project: projectId,
+      assignee: task.assignee,
+      groupBy: "ASSIGNEE",
+    });
+    const index = oldTaskGroup.tasks.indexOf(taskId);
+    oldTaskGroup.tasks.splice(index, 1);
+    newTaskGroup.tasks.push(taskId);
+    await Promise.all([oldTaskGroup.save(), newTaskGroup.save()]);
   }
+
   updatedTask.status = task.status;
   updatedTask.assignee = task.assignee;
   updatedTask.priority = task.priority;

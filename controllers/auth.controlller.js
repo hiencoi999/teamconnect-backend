@@ -5,7 +5,6 @@ const User = require("../models/user.model");
 class AuthController {
   static async login(req, res) {
     try {
-      console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
       if (req.body.credential) {
         const verificationResponse = await verifyGoogleToken(
           req.body.credential

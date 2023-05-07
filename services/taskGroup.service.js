@@ -23,7 +23,6 @@ async function updateTaskGroups(
   taskId,
   newGroupId
 ) {
-  console.log({ taskId, newGroupId });
   const newTasks = columns.map((column) => {
     return column.tasks.map((task) => {
       return task._id;
@@ -91,7 +90,6 @@ async function deleteGroup(groupId) {
   if (!verifyObjectId(groupId)) return;
   const deletedGroup = await TaskGroup.findOne({_id: groupId})
   if(!deletedGroup) return;
-  console.log({deletedGroup})
   if(deletedGroup.type !== "DOING") return;
   if(deletedGroup.tasks.length !== 0) return "NOT_EMPTY";
   await TaskGroup.deleteOne({_id: groupId})

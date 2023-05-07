@@ -5,6 +5,7 @@ const projectMemberSchema = new mongoose.Schema(
     project: { type: mongoose.Schema.Types.ObjectId, ref: "project" },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     role: { type: String, enum: ["LEADER", "MEMBER"] },
+    isDeleted: { type: Boolean, default: false },
   },
   { collection: "project_member" }
 );

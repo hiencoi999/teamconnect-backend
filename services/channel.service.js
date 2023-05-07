@@ -10,7 +10,7 @@ async function createChannel(projectId, name, userId, isGlobal) {
   const channel = new Channel({
     name: name,
     project: projectId,
-    isGlobal: isGlobal
+    isGlobal: isGlobal,
   });
   await channel.save();
   await createChannelMember(channel._id, userId);
@@ -33,8 +33,7 @@ async function getChannelsByUserId(userId) {
   const data = await ChannelMember.find({ user: userId })
     .populate({ path: "channel", match: { isDeleted: false } })
     .exec();
-    const channelMembers = data.filter(member => member.channel !== null)
-    console.log(channelMembers)
+  const channelMembers = data.filter((member) => member.channel !== null);
   if (!channelMembers.length) {
     return [];
   }
@@ -48,23 +47,26 @@ async function getChannelsByUserId(userId) {
     return 0;
   });
 
-  const projects = await getProjectsByUserId(userId, false)
+  const projects = await getProjectsByUserId(userId, false);
 
-  const channels = []
+  const channels = [];
 
-  projects.forEach(project => {
-    const projectChannels = []
-    channelMembers.forEach(member => {
-      if(member.channel.project.equals(project.project._id)) {
-        projectChannels.push({channel: member.channel})
+  projects.forEach((project) => {
+    const projectChannels = [];
+    channelMembers.forEach((member) => {
+      if (member.channel.project.equals(project.project._id)) {
+        projectChannels.push({
+          channel: member.channel,
+          unReadMessages: member.unReadMessages,
+        });
       }
-    })
-    channels.push({project: project.project, channels: projectChannels})
-  })
-  return channels
+    });
+    channels.push({ project: project.project, channels: projectChannels });
+  });
+  return channels;
 }
 
-async function deleteChannel(channelId) {
+async function deleteOneChannel(channelId) {
   if (!verifyObjectId(channelId)) return;
   const deletedChannel = await Channel.deleteOne({ _id: channelId });
   await Message.deleteMany({ channel: channelId });
@@ -72,9 +74,19 @@ async function deleteChannel(channelId) {
   return deletedChannel;
 }
 
+async function readAllMessages(channelId, userId) {
+  if (!verifyObjectId(channelId)) return;
+  const memberReadMessage = await ChannelMember.updateOne(
+    { channel: channelId, user: userId },
+    { unReadMessages: 0 }
+  );
+  return memberReadMessage;
+}
+
 module.exports = {
   createChannel,
   getChannelsByUserId,
   getChannelAndMember,
-  deleteChannel,
+  deleteOneChannel,
+  readAllMessages,
 };

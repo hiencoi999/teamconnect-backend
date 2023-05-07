@@ -35,7 +35,7 @@ class TaskController {
     try {
       const tasks = await getAllTask(req.params.projectId, req.query.groupBy);
       if (!tasks) res.status(400).json({ message: "No tasks found" });
-      res.status(200).json({ tasks });
+      else res.status(200).json({ tasks });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -48,7 +48,7 @@ class TaskController {
     try {
       const task = await getOneTask(req.params.taskId);
       if (!task) res.status(400).json({ message: "bad request" });
-      res.status(200).json({ task });
+      else res.status(200).json({ task });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -65,8 +65,7 @@ class TaskController {
         req.body.updatedTask
       );
       if (!newTask) res.status(400).json({ message: "bad request" });
-
-      res.status(200).json({ message: "updated" });
+      else res.status(200).json({ message: "updated" });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -79,7 +78,7 @@ class TaskController {
     try {
       const deletedTask = await deleteTask(req.params.projectId, req.params.taskId);
       if (!deletedTask) res.status(400).json({ message: "bad request" });
-      res.status(200).json({ message: "deleted" });
+      else res.status(200).json({ message: "deleted" });
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -167,7 +166,7 @@ class TaskController {
         req.params.fileId
       );
       if (!deletedFile) res.status(400).json({ message: "bad request" });
-      res.status(200).json({ message: "deleted" });
+      else res.status(200).json({ message: "deleted" });
     } catch (error) {
       console.log(error);
       res.status(500).json({

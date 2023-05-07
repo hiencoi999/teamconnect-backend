@@ -16,6 +16,7 @@ async function createInvitation(userId, projectId, emails) {
       let isProjectMember = await ProjectMember.count({
         project: projectId,
         user: isExistUser?._id,
+        isDeleted: false
       });
 
       if (!isExist && !isProjectMember) {

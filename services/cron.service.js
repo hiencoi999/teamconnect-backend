@@ -3,7 +3,7 @@ const { deletePermanentProjects } = require("./project.service");
 
 function runCronJobs() {
   const job = new cron.CronJob({
-    cronTime: "0 * * * * *", // Run job everyday
+    cronTime: "0 0 0 * * *", // Run job everyday
     onTick: async function () {
       await deletePermanentProjects();
     },

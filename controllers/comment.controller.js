@@ -9,7 +9,7 @@ class CommentController {
         req.body.description
       );
       if(!comment) res.status(400).json({message: 'bad request'})
-      res.status(201).json({message: 'created'})
+      else res.status(201).json({message: 'created'})
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -34,7 +34,7 @@ class CommentController {
     try {
       const updatedComment = await updateOneComment(req.decoded.userId, req.params.commentId, req.body.description)
       if(!updatedComment) res.status(400).json({message: 'bad request'})
-      res.status(200).json({message: 'updated'})
+      else res.status(200).json({message: 'updated'})
     } catch (error) {
       console.log(error);
       res.status(500).json({
@@ -47,7 +47,7 @@ class CommentController {
     try {
       const deletedComment = await deleteOneComment(req.decoded.userId, req.params.commentId)
       if(!deletedComment) res.status(400).json({message: 'bad request'})
-      res.status(200).json({message: 'deleted'})
+      else res.status(200).json({message: 'deleted'})
     } catch (error) {
       console.log(error);
       res.status(500).json({
