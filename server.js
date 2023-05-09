@@ -109,7 +109,6 @@ io.on("connection", (socket) => {
       emails.push(member.user.email);
     });
     emails.map((email) => {
-      console.log({ email });
       const socketIds = getObjectKey(onlineUsers, email);
       io.to(socketIds).emit("getNewBoard", {
         email,

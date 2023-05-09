@@ -168,7 +168,8 @@ async function updateTask(projectId, taskId, task) {
     oldTaskGroup.tasks.splice(index, 1);
     newTaskGroup.tasks.push(taskId);
     await Promise.all([oldTaskGroup.save(), newTaskGroup.save()]);
-  } else if (!updatedTask.assignee?.equals(task.assignee?._id)) {
+  } else if (updatedTask?.assignee !== task?.assignee) {
+
     const oldTaskGroup = await TaskGroup.findOne({
       project: projectId,
       assignee: updatedTask.assignee,
@@ -181,10 +182,10 @@ async function updateTask(projectId, taskId, task) {
     });
     const index = oldTaskGroup.tasks.indexOf(taskId);
     oldTaskGroup.tasks.splice(index, 1);
+    await oldTaskGroup.save();
     newTaskGroup.tasks.push(taskId);
-    await Promise.all([oldTaskGroup.save(), newTaskGroup.save()]);
+    await newTaskGroup.save();
   }
-
   updatedTask.status = task.status;
   updatedTask.assignee = task.assignee;
   updatedTask.priority = task.priority;
