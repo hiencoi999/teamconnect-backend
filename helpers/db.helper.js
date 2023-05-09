@@ -3,8 +3,8 @@ require("dotenv").config({ path: "./.env" });
 
 const connectDB = async () => {
 
-  // const DB_URL = `mongodb+srv://admin:${process.env.DB_PASSWORD}@kltn.zphpbrv.mongodb.net/?retryWrites=true&w=majority`;
-  const DB_URL = `mongodb://127.0.0.1:27017/ktln`;
+  const DB_URL = `mongodb+srv://admin:${process.env.DB_PASSWORD}@kltn.zphpbrv.mongodb.net/?retryWrites=true&w=majority`;
+  // const DB_URL = `mongodb://127.0.0.1:27017/ktln`;
 
   mongoose
     .connect(DB_URL, {
